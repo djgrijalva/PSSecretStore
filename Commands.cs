@@ -90,6 +90,46 @@ namespace PSSecretStore
             }
         }
     }
+    
+    [Cmdlet(VerbsCommon.Remove, "SSSecret")]
+    public class SetSecretCommand : PSCmdlet
+    {
+        [Parameter(Mandatory = true)]
+        public string Name { get; set; }
+
+        [Parameter(Mandatory = true)]
+        public string StorePath { get; set; }
+
+        [Parameter(Mandatory = true, ParameterSetName = "KeyPath")]
+        public string KeyPath { get; set; }
+
+        [Parameter(Mandatory = true, ParameterSetName = "Password")]
+        public string Password { get; set; }
+
+        protected override void ProcessRecord() 
+        {
+			if (File.Exists(StorePath)) {
+				using (var sman = SecretsManager.LoadStore(StorePath)) {
+					if (ParameterSetName == "KeyPath")
+					{
+						KeyPath = GetUnresolvedProviderPathFromPSPath(KeyPath);
+						sman.LoadKeyFromFile(KeyPath);
+					}
+
+					if (ParameterSetName == "Password")
+					{
+						sman.LoadKeyFromPassword(Password);                
+					}
+
+					sman.Delete(Name);
+
+					StorePath = GetUnresolvedProviderPathFromPSPath(StorePath);
+
+					sman.SaveStore(StorePath);
+				}   
+			}
+        }
+    }
 
     [Cmdlet(VerbsCommon.Get, "SSSecret")]
     public class GetSecretCommand : PSCmdlet
