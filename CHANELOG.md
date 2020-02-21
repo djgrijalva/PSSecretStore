@@ -1,3 +1,9 @@
+# 0.0.2 - 2/21/2020
+
+## Added
+
+- Added Remove-SSSecret cmdlet
+
 # 0.0.2 - 1/29/2020
 
 ## Added
